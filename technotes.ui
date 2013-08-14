@@ -418,48 +418,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="currentTechnicianComboBox">
-          <item>
-           <property name="text">
-            <string>Nicholas P.</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Rupinder</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Nick F.</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Zach</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Jason</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Jara</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Alex</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Jarrod</string>
-           </property>
-          </item>
-         </widget>
+         <widget class="QComboBox" name="currentTechnicianComboBox"/>
         </item>
        </layout>
       </item>

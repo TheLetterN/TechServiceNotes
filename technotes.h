@@ -56,6 +56,7 @@ private:
     void populateServiceForm();
     void closeService();
     void openService();
+    void loadTechnicians();
     QString listEntry();
 };
 

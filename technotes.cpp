@@ -20,6 +20,7 @@ TechNotes::TechNotes(QWidget *parent) :
     ui(new Ui::TechNotes)
 {
     ui->setupUi(this);
+    loadTechnicians();
 
     currentService = new NoteData;
 
@@ -50,6 +51,7 @@ TechNotes::~TechNotes()
     delete ui;
 }
 
+//Updates the UI widgets to be enabled/disabled as relevant to the current mode
 void TechNotes::updateInterface(TechNotes::Mode mode)
 {
     currentMode = mode;
@@ -166,16 +168,21 @@ void TechNotes::updateInterface(TechNotes::Mode mode)
     }
 }
 
+//Allows a new service to be created
 void TechNotes::newService()
 {
     updateInterface(EditMode);
 
     delete currentService;
     currentService = new NoteData;
-
     clearService();
+    //insert the technician who started the service
+    ui->notesEdit->setText("Started by " + ui->currentTechnicianComboBox->currentText() + " @ " +
+                           QDateTime::currentDateTime().toString("MM/dd hh:mm AP") + ":\t");
+
 }
 
+//Makes service notes editable and automatically inserts a string with the current technician and time of update
 void TechNotes::updateService()
 {
     updateInterface(UpdateMode);
@@ -183,9 +190,10 @@ void TechNotes::updateService()
     //Updated by: <current technician> @ <current date and time>:
     ui->notesEdit->setText(ui->notesEdit->toPlainText() + "\n\nUpdate by " +
                            ui->currentTechnicianComboBox->currentText() + " @ " +
-                           QDateTime::currentDateTime().toString("MM/dd hh.mm AP") + ":\n\n");
+                           QDateTime::currentDateTime().toString("MM/dd hh:mm AP") + ":\t");
 }
 
+//Allows editing of all service parameters
 void TechNotes::editService()
 {
     updateInterface(EditMode);
@@ -218,6 +226,7 @@ void TechNotes::popOutService()
     popout->show();
 }
 
+//Saves the current service information to its corresponding file and list entry
 void TechNotes::saveService()
 {
     if (ui->firstNameEdit->text().isEmpty() ||
@@ -259,6 +268,7 @@ void TechNotes::saveService()
     }
 }
 
+//loads a directory of service files to the relevant list
 void TechNotes::loadServiceList()
 {
     ui->servicesListWidget->clear();
@@ -276,7 +286,6 @@ void TechNotes::loadServiceList()
                 fileName = path_to_files.path() + "/" + fileName;
                 currentService->loadFromFile(fileName);
                 currentServiceList->insert(listEntry(), *currentService);
-                //ui->servicesListWidget->addItem(listEntry());
             }
         }
 
@@ -290,7 +299,6 @@ void TechNotes::loadServiceList()
                 fileName = path_to_files.path() + "/" + fileName;
                 currentService->loadFromFile(fileName);
                 currentServiceList->insert(listEntry(), *currentService);
-                //ui->servicesListWidget->addItem(listEntry());
             }
         }
     }
@@ -466,7 +474,9 @@ void TechNotes::closeService()
         saveService();
     }
     openServiceList.remove(listEntry());
-    closedServiceList.insert(listEntry(), *currentService);
+    //Make sure the list isn't empty before inserting, otherwise loadServiceList() will never load the closed service files if it hasn't already!
+    if (!closedServiceList.isEmpty())
+        closedServiceList.insert(listEntry(), *currentService);
     loadServiceList();
 }
 
@@ -493,8 +503,28 @@ void TechNotes::openService()
         saveService();
     }
     closedServiceList.remove(listEntry());
-    openServiceList.insert(listEntry(), *currentService);
+    //Make sure the list isn't empty before inserting, otherwise loadServiceList() will never load the open service files if it hasn't already!
+    if(!openServiceList.isEmpty())
+        openServiceList.insert(listEntry(), *currentService);
     loadServiceList();
+}
+
+//loads the list of technicians from the plaintext file technicians.txt
+void TechNotes::loadTechnicians()
+{
+    QString fileName = data_path + "/technicians.txt";
+    QFile inFile(fileName);
+    if (!inFile.open(QIODevice::ReadOnly)) {
+        return;
+    } else {
+        QTextStream inText(&inFile);
+        QString temp = "";
+        while(!inText.atEnd()) {
+            temp = inText.readLine();
+            ui->currentTechnicianComboBox->addItem(temp);
+        }
+        inFile.close();
+    }
 }
 
 QString TechNotes::listEntry()
@@ -502,7 +532,7 @@ QString TechNotes::listEntry()
     if (currentService->getLastName() == "") {
         return "";
     } else {
-        QString entry = "Due: " + currentService->getDueDate().toString("MM/dd @ hh.mm AP") + "\t" +
+        QString entry = "Due: " + currentService->getDueDate().toString("MM/dd @ hh:mm AP") + "\t" +
                 currentService->getLastName() + ", " + currentService->getFirstName() + "\t\t" +
                 currentService->getComputerModel() + " in " + currentService->getLocation();
         return entry;
