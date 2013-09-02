@@ -58,51 +58,77 @@ void NoteData::saveToFile(const QString &fileName)
     } else {
         QDataStream outFileStream(&outFile);
         outFileStream.setVersion(QDataStream::Qt_4_8);
-        outFileStream << firstName <<
-                         lastName <<
-                         phoneNumber <<
-                         services <<
-                         startedDate <<
-                         dueDate <<
-                         computerTypeToText() <<
-                         computerModel <<
-                         location <<
-                         additionalItems <<
-                         notes <<
-                         currentTechnician <<
-                         serviceStatusToText();
+
+        outFileStream <<
+                         "FIRST_NAME=" + firstName <<
+                         "LAST_NAME=" + lastName <<
+                         "PHONE_NUMBER=" + phoneNumber <<
+                         "SERVICES=" + services <<
+                         "STARTED_DATE=" + startedDate.toString() <<
+                         "DUE_DATE=" + dueDate.toString() <<
+                         "COMPUTER_TYPE=" + computerTypeToText() <<
+                         "COMPUTER_MODEL=" + computerModel <<
+                         "LOCATION=" + location <<
+                         "ADDITIONAL_ITEMS=" + additionalItems <<
+                         "NOTES=" + notes <<
+                         "CURRENT_TECHNICIAN=" + currentTechnician <<
+                         "SERVICES_STATUS=" + serviceStatusToText();
         outFile.close();
     }
 }
 
 void NoteData::loadFromFile(const QString &fileName)
 {
+
     QTextStream textOut(stdout);
     QFile inFile(fileName);
     if(!inFile.open(QIODevice::ReadOnly)) {
         textOut << "Error, could not load file: " << fileName << endl;
         return;
     } else {
-        QString tempCompType;
-        QString tempStatusType;
         QDataStream inFileStream(&inFile);
         inFileStream.setVersion(QDataStream::Qt_4_8);
-        inFileStream >> firstName >>
-                         lastName >>
-                         phoneNumber >>
-                         services >>
-                         startedDate >>
-                         dueDate >>
-                         tempCompType >>
-                         computerModel >>
-                         location >>
-                         additionalItems >>
-                         notes >>
-                         currentTechnician >>
-                         tempStatusType;
-        cType = computerTypeFromText(tempCompType);
-        sStatus = serviceStatusFromText(tempStatusType);
-        textOut << "Loaded file: " << fileName << endl;
+
+        QString tempCompType;
+        QString tempStatusType;
+
+        QString tempText;
+
+        //Gets the first chunk of data so we can test it to see what format the database is in
+
+        inFileStream >> tempText;
+
+        //Checks to see if files are in the original, not-very-expandable format, and fixes them if so
+        if (!tempText.contains("=")) {
+
+            firstName = tempText;
+
+            inFileStream >>  lastName >>
+                             phoneNumber >>
+                             services >>
+                             startedDate >>
+                             dueDate >>
+                             tempCompType >>
+                             computerModel >>
+                             location >>
+                             additionalItems >>
+                             notes >>
+                             currentTechnician >>
+                             tempStatusType;
+            cType = computerTypeFromText(tempCompType);
+            sStatus = serviceStatusFromText(tempStatusType);
+            textOut << "Loaded file: " << fileName << endl;
+
+
+        } else {
+            textOut << "New format fucker detected!" << endl;
+            parseFromFile(tempText);
+
+            while (!inFileStream.atEnd()) {
+                inFileStream >> tempText;
+                parseFromFile(tempText);
+            }
+        }
     }
 }
 
@@ -316,4 +342,34 @@ QString NoteData::getLocation() const
 void NoteData::setLocation(const QString &value)
 {
     location = value;
+}
+
+void NoteData::parseFromFile(QString tempText) {
+    if (tempText.contains("FIRST_NAME=")) {
+        firstName = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("LAST_NAME=")) {
+        lastName = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("PHONE_NUMBER=")) {
+        phoneNumber = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("SERVICES=")) {
+        services = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("STARTED_DATE=")) {
+        startedDate = QDateTime::fromString(tempText.remove(0, tempText.indexOf("=") + 1));
+    } else if (tempText.contains("DUE_DATE=")) {
+        dueDate = QDateTime::fromString(tempText.remove(0, tempText.indexOf("=") + 1));
+    } else if (tempText.contains("COMPUTER_TYPE=")) {
+        computerTypeFromText(tempText.remove(0, tempText.indexOf("=") + 1));
+    } else if (tempText.contains("COMPUTER_MODEL=")) {
+        computerModel = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("LOCATION=")) {
+        location = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("ADDITIONAL_ITEMS=")) {
+        additionalItems = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("NOTES=")) {
+        notes = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("CURRENT_TECHNICIAN=")) {
+        currentTechnician = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("SERVICES_STATUS=")) {
+        serviceStatusFromText(tempText.remove(0, tempText.indexOf("=") + 1));
+    }
 }

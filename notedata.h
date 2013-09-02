@@ -79,6 +79,8 @@ private:
     QString currentTechnician;
     ServiceStatus sStatus;
 
+    void parseFromFile(QString);
+
 
 
 };
