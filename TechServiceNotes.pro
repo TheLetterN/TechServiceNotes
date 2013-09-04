@@ -15,11 +15,22 @@ TEMPLATE = app
 SOURCES += main.cpp\
         technotes.cpp \
     notedata.cpp \
-    popouttext.cpp
+    popouttext.cpp \
+    licensedialog.cpp \
+    configdata.cpp
 
 HEADERS  += technotes.h \
     notedata.h \
-    popouttext.h
+    popouttext.h \
+    licensedialog.h \
+    configdata.h
 
 FORMS    += technotes.ui \
-    popouttext.ui
+    popouttext.ui \
+    licensedialog.ui
+
+OTHER_FILES += \
+    license.txt
+
+RESOURCES += \
+    textfiles.qrc

@@ -1,5 +1,26 @@
+//Tech Service Notes - A tracker for tech support services
+//Copyright (C) 2013 by Fluffyware
+
+//This program is free software; you can redistribute it and/or
+//modify it under the terms of the GNU General Public License
+//as published by the Free Software Foundation; either version 2
+//of the License, or (at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program; if not, write to the Free Software
+//Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
 #include "technotes.h"
 #include "ui_technotes.h"
+#include "licensedialog.h"
+#include "configdata.h"
+
 #include <QDir>
 #include <QTextStream>
 #include <QMessageBox>
@@ -20,6 +41,24 @@ TechNotes::TechNotes(QWidget *parent) :
     ui(new Ui::TechNotes)
 {
     ui->setupUi(this);
+
+    //load the configuration file
+    ConfigData config;
+    config.loadData(data_path + "/techservicenotes.cfg");
+
+    //check to make sure the user has agreed to the license!
+    if (config.getLicenseStatus() != true) {
+        //display the license dialog
+        LicenseDialog *ldialog = new LicenseDialog;
+        if (ldialog->exec() == QDialog::Accepted) {
+            config.setLicenseStatus(true);
+            config.saveData(data_path + "/techservicenotes.cfg");
+        } else {
+            //exit the program if the user does not agree to the license
+            exit(0);
+        }
+    }
+
     loadTechnicians();
 
     currentService = new NoteData;
