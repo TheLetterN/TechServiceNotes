@@ -12,29 +12,29 @@ LicenseDialog::LicenseDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->licenseBrowser->setReadOnly(true);
 
-    QString license;
+//    QString license;
 
-    QTextStream sout(stdout);
+//    QTextStream sout(stdout);
 
-    //open the license file to display
-    QFile inFile("license.txt");
+//    //open the license file to display
+//    QFile inFile("license.txt");
 
-    if(!inFile.open(QIODevice::ReadOnly)) {
-        sout << "Error, could not load license file!" << endl;
-        return;
-    } else {
-        QTextStream fin(&inFile);
-        license = fin.readAll();
-        inFile.close();
+//    if(!inFile.open(QIODevice::ReadOnly)) {
+//        sout << "Error, could not load license file!" << endl;
+//        return;
+//    } else {
+//        QTextStream fin(&inFile);
+//        license = fin.readAll();
+//        inFile.close();
 
-        ui->licenseBrowser->setText(license);
-    }
-
-
+//        ui->licenseBrowser->setText(license);
+//    }
 
 
 
-    ui->licenseBrowser->setText(license);
+
+
+//    ui->licenseBrowser->setText(license);
 }
 
 LicenseDialog::~LicenseDialog()

@@ -33,7 +33,7 @@
 QString data_path = QDir::homePath() + "/.config/Fluffyware/TechServiceNotes";
 #endif
 #ifdef Q_OS_WIN32
-QString data_path = "/ProgramData/Fluffyware/TechServiceNotes";
+QString data_path = QDir::homePath() + /AppData/Roaming/Fluffyware/TechServiceNotes";
 #endif
 
 TechNotes::TechNotes(QWidget *parent) :
@@ -104,6 +104,7 @@ void TechNotes::updateInterface(TechNotes::Mode mode)
         ui->lastNameEdit->setEnabled(false);
         ui->phoneNumberEdit->setReadOnly(true);
         ui->phoneNumberEdit->setEnabled(false);
+        ui->orderNumberEdit->setEnabled(false);
         ui->servicesEdit->setReadOnly(true);
         ui->servicesEdit->setEnabled(false);
         ui->startedDateTimeEdit->setReadOnly(true);
@@ -185,6 +186,7 @@ void TechNotes::updateInterface(TechNotes::Mode mode)
         ui->lastNameEdit->setEnabled(true);
         ui->phoneNumberEdit->setReadOnly(false);
         ui->phoneNumberEdit->setEnabled(true);
+        ui->orderNumberEdit->setEnabled(true);
         ui->servicesEdit->setReadOnly(false);
         ui->servicesEdit->setEnabled(true);
         ui->startedDateTimeEdit->setReadOnly(false);
@@ -280,9 +282,11 @@ void TechNotes::saveService()
         QString oldListEntry = listEntry();
 
         delete currentService;
+
         currentService = new NoteData(ui->firstNameEdit->text(),
                                       ui->lastNameEdit->text(),
                                       ui->phoneNumberEdit->text(),
+                                      ui->orderNumberEdit->text(),
                                       ui->servicesEdit->text(),
                                       ui->startedDateTimeEdit->dateTime(),
                                       ui->dueDateTimeEdit->dateTime(),
@@ -303,6 +307,7 @@ void TechNotes::saveService()
         saveServiceToFile();
 
         updateInterface(ViewMode);
+
         loadServiceList();
     }
 }
@@ -477,6 +482,7 @@ void TechNotes::populateServiceForm()
     ui->firstNameEdit->setText(currentService->getFirstName());
     ui->lastNameEdit->setText(currentService->getLastName());
     ui->phoneNumberEdit->setText(currentService->getPhoneNumber());
+    ui->orderNumberEdit->setText(currentService->getOrderNumber());
     ui->servicesEdit->setText(currentService->getServices());
     ui->startedDateTimeEdit->setDateTime(currentService->getStartedDate());
     ui->dueDateTimeEdit->setDateTime(currentService->getDueDate());
@@ -487,7 +493,6 @@ void TechNotes::populateServiceForm()
     ui->notesEdit->setText(currentService->getNotes());
     ui->currentTechnicianComboBox->setCurrentIndex(ui->currentTechnicianComboBox->findText(currentService->getCurrentTechnician()));
     ui->serviceStatusComboBox->setCurrentIndex(ui->serviceStatusComboBox->findText(currentService->serviceStatusToText()));
-
 }
 
 void TechNotes::closeService()

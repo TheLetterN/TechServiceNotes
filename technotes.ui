@@ -130,7 +130,7 @@
         <item>
          <widget class="QLabel" name="firstNameLabel">
           <property name="text">
-           <string>First Name</string>
+           <string>First Name:</string>
           </property>
          </widget>
         </item>
@@ -206,6 +206,20 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Order #:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="orderNumberEdit">
+          <property name="placeholderText">
+           <string>(optional)</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

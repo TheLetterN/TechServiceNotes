@@ -26,6 +26,7 @@ NoteData::NoteData()
     firstName = "";
     lastName = "";
     phoneNumber = "";
+    orderNumber = "";
     services = "";
     startedDate = QDateTime::currentDateTime();
     dueDate = QDateTime::currentDateTime().addDays(2);
@@ -42,6 +43,7 @@ NoteData::NoteData()
 NoteData::NoteData(const QString &fn,                   //First Name
                    const QString &ln,                   //Last Name
                    const QString &pn,                   //Phone Number
+                   const QString &on,                   //Order Number
                    const QString &sv,                   //Services
                    const QDateTime &sd,                 //Start Date
                    const QDateTime &dd,                 //Due Date
@@ -56,6 +58,7 @@ NoteData::NoteData(const QString &fn,                   //First Name
     firstName = fn;
     lastName = ln;
     phoneNumber = pn;
+    orderNumber = on;
     services = sv;
     startedDate = sd;
     dueDate = dd;
@@ -81,6 +84,7 @@ void NoteData::saveToFile(const QString &fileName)
                          "FIRST_NAME=" + firstName <<
                          "LAST_NAME=" + lastName <<
                          "PHONE_NUMBER=" + phoneNumber <<
+                         "ORDER_NUMBER=" + orderNumber <<
                          "SERVICES=" + services <<
                          "STARTED_DATE=" + startedDate.toString() <<
                          "DUE_DATE=" + dueDate.toString() <<
@@ -372,6 +376,8 @@ void NoteData::parseFromFile(QString tempText) {
         lastName = tempText.remove(0, tempText.indexOf("=") + 1);
     } else if (tempText.contains("PHONE_NUMBER=")) {
         phoneNumber = tempText.remove(0, tempText.indexOf("=") + 1);
+    } else if (tempText.contains("ORDER_NUMBER=")) {
+        orderNumber = tempText.remove(0, tempText.indexOf("=") + 1);
     } else if (tempText.contains("SERVICES=")) {
         services = tempText.remove(0, tempText.indexOf("=") + 1);
     } else if (tempText.contains("STARTED_DATE=")) {
@@ -393,4 +399,14 @@ void NoteData::parseFromFile(QString tempText) {
     } else if (tempText.contains("SERVICES_STATUS=")) {
         serviceStatusFromText(tempText.remove(0, tempText.indexOf("=") + 1));
     }
+}
+
+QString NoteData::getOrderNumber() const
+{
+    return orderNumber;
+}
+
+void NoteData::setOrderNumber(const QString &value)
+{
+    orderNumber = value;
 }

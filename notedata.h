@@ -28,7 +28,7 @@ public:
     enum ServiceStatus { NotStarted, InProgress, CustomerCalled, Closed };
 
     NoteData();
-    NoteData(const QString &fn, const QString &ln, const QString &pn, const QString &sv,
+    NoteData(const QString &fn, const QString &ln, const QString &pn, const QString &on, const QString &sv,
              const QDateTime &sd, const QDateTime &dd, const ComputerType &ct,
              const QString &cm, const QString &lc, const QString &ai, const QString &nt, const QString &tc,
              const ServiceStatus &ss);
@@ -82,10 +82,14 @@ public:
     QString getLocation() const;
     void setLocation(const QString &value);
 
+    QString getOrderNumber() const;
+    void setOrderNumber(const QString &value);
+
 private:
     QString firstName;
     QString lastName;
     QString phoneNumber;
+    QString orderNumber;
     QString services;
     QDateTime startedDate;
     QDateTime dueDate;
