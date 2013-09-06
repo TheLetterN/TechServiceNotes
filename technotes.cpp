@@ -33,7 +33,7 @@
 QString data_path = QDir::homePath() + "/.config/Fluffyware/TechServiceNotes";
 #endif
 #ifdef Q_OS_WIN32
-QString data_path = QDir::homePath() + /AppData/Roaming/Fluffyware/TechServiceNotes";
+QString data_path = QDir::homePath() + "/AppData/Roaming/Fluffyware/TechServiceNotes";
 #endif
 
 TechNotes::TechNotes(QWidget *parent) :
@@ -42,8 +42,9 @@ TechNotes::TechNotes(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //load the configuration file
+    //load the configuration file, first making sure our data file directory exists
     ConfigData config;
+    config.dataFolderExists(data_path);
     config.loadData(data_path + "/techservicenotes.cfg");
 
     //check to make sure the user has agreed to the license!
@@ -59,7 +60,9 @@ TechNotes::TechNotes(QWidget *parent) :
         }
     }
 
+    //load the list of technicians and any miscellaneous notes present
     loadTechnicians();
+    loadMiscNotes();
 
     currentService = new NoteData;
 
@@ -81,6 +84,7 @@ TechNotes::TechNotes(QWidget *parent) :
     connect(ui->applyButton, SIGNAL(clicked()), this, SLOT(saveService()));
     connect(ui->servicesListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(popOutService()));
     connect(ui->printServiceButton, SIGNAL(clicked()), this, SLOT(printService()));
+    connect(ui->miscEditButton, SIGNAL(clicked()), this, SLOT(editMiscNotes()));
 
     setWindowTitle("Tech Service Notes");
 }
@@ -119,6 +123,7 @@ void TechNotes::updateInterface(TechNotes::Mode mode)
         ui->notesEdit->setReadOnly(true);
         ui->applyButton->setEnabled(false);
         ui->cancelButton->setEnabled(false);
+        ui->miscNotesEdit->setReadOnly(true);
 
         //check to see if a service is present, and enable/disable relevant UI elements
         bool presentService = !currentService->isEmpty();
@@ -136,6 +141,7 @@ void TechNotes::updateInterface(TechNotes::Mode mode)
         ui->servicesComboBox->setEnabled(true);
         ui->servicesListWidget->setEnabled(true);
         ui->newServiceButton->setEnabled(true);
+        ui->miscEditButton->setEnabled(true);
 
     }break;
 
@@ -159,6 +165,7 @@ void TechNotes::updateInterface(TechNotes::Mode mode)
         ui->computerModelEdit->setEnabled(false);
         ui->locationComboBox->setEnabled(false);
         ui->additionalItemsEdit->setEnabled(false);
+        ui->miscEditButton->setEnabled(false);
 
         //turn on stuff we can use while updating the service
         ui->notesEdit->setReadOnly(false);
@@ -178,6 +185,7 @@ void TechNotes::updateInterface(TechNotes::Mode mode)
         ui->updateServiceButton->setEnabled(false);
         ui->newServiceButton->setEnabled(false);
         ui->editServiceButton->setEnabled(false);
+        ui->miscEditButton->setEnabled(false);
 
         //turn on stuff we can use while editing the service
         ui->firstNameEdit->setReadOnly(false);
@@ -229,7 +237,7 @@ void TechNotes::updateService()
     updateInterface(UpdateMode);
     //automatically insert a string into the Notes textEdit box in the format of:
     //Updated by: <current technician> @ <current date and time>:
-    ui->notesEdit->setText(ui->notesEdit->toPlainText() + "\n\nUpdate by " +
+    ui->notesEdit->setText(ui->notesEdit->toPlainText() + "\n\nUpdate by: " +
                            ui->currentTechnicianComboBox->currentText() + " @ " +
                            QDateTime::currentDateTime().toString("MM/dd hh:mm AP") + ":\t");
 }
@@ -431,11 +439,59 @@ void TechNotes::printService()
     }
 }
 
+void TechNotes::editMiscNotes()
+{
+    ui->miscNotesEdit->setReadOnly(false);
+
+    ui->miscEditButton->setText("&Done");
+    ui->miscEditButton->disconnect();
+
+    connect(ui->miscEditButton, SIGNAL(clicked()), this, SLOT(submitMiscNotes()));
+
+    //automatically insert a string into the Misc. Notes box in the format of:
+    //Note by: <current technician> @ <current date and time>:
+    QString newlines = "";
+    newlines = ui->miscNotesEdit->toPlainText();
+    if (newlines != "")
+        newlines = "\n\n";
+    ui->miscNotesEdit->setText(ui->miscNotesEdit->toPlainText() + newlines + "Note by: " +
+                           ui->currentTechnicianComboBox->currentText() + " @ " +
+                           QDateTime::currentDateTime().toString("MM/dd hh:mm AP") + ":\t");
+}
+
+void TechNotes::submitMiscNotes()
+{
+    ui->miscEditButton->setText("Edit &Misc. Notes");
+
+    ui->miscEditButton->disconnect();
+    connect(ui->miscEditButton, SIGNAL(clicked()), this, SLOT(editMiscNotes()));
+
+    ui->miscNotesEdit->setReadOnly(true);
+
+    QFile outFile(data_path + "/miscnotes.txt");
+
+    QTextStream sout(stdout);
+
+    if (!outFile.open(QIODevice::WriteOnly)) {
+        sout << tr("Error: could not open file \"") << data_path + "/miscnotes.txt" << "\"!" << endl;
+        return;
+    } else {
+        QTextStream fout(&outFile);
+
+        fout << ui->miscNotesEdit->toPlainText();
+        sout << tr("Successfully wrote \"%1\"!").arg(data_path + "/miscnotes.txt") << endl;
+
+        outFile.close();
+    }
+
+}
+
 void TechNotes::clearService()
 {
     ui->firstNameEdit->clear();
     ui->lastNameEdit->clear();
     ui->phoneNumberEdit->clear();
+    ui->orderNumberEdit->clear();
     ui->servicesEdit->clear();
     ui->startedDateTimeEdit->setDateTime(QDateTime::currentDateTime());
     ui->dueDateTimeEdit->setDateTime(QDateTime::currentDateTime().addDays(2));
@@ -568,6 +624,21 @@ void TechNotes::loadTechnicians()
             ui->currentTechnicianComboBox->addItem(temp);
         }
         inFile.close();
+    }
+}
+
+void TechNotes::loadMiscNotes()
+{
+    QFile fileIn(data_path + "/miscnotes.txt");
+
+    if (!fileIn.open(QIODevice::ReadOnly)) {
+        return;
+    } else {
+        QTextStream fin(&fileIn);
+
+        ui->miscNotesEdit->setText(fin.readAll());
+
+        fileIn.close();
     }
 }
 

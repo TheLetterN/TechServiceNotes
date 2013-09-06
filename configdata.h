@@ -9,6 +9,7 @@ public:
     ConfigData();
     void loadData(const QString &filename);
     void saveData(const QString &filename);
+    void dataFolderExists(const QString &path);
     bool getLicenseStatus();
     void setLicenseStatus(bool);
 

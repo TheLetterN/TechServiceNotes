@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QObject>
+#include <QDir>
 
 ConfigData::ConfigData()
 {
@@ -60,6 +61,22 @@ void ConfigData::saveData(const QString &filename)
         fout << "LICENSE_ACCEPTED=" + licenseStatusToText() << endl;
     }
 
+}
+
+void ConfigData::dataFolderExists(const QString &path)
+{
+    QDir path_to_file(path);
+
+    QTextStream textOut(stdout);
+
+    if (!path_to_file.exists()) {
+        textOut << QObject::tr("\"%1\" does not exist. Attempting to create it... ").arg(path_to_file.path());
+        if (path_to_file.mkpath(path_to_file.path()))
+            textOut << QObject::tr("successfully!");
+        else
+            textOut << QObject::tr("unsuccessfully. :(");
+        textOut << endl;
+    }
 }
 
 bool ConfigData::getLicenseStatus()

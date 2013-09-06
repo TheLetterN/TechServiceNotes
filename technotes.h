@@ -55,6 +55,8 @@ private slots:
     void deleteService();
     void cancel();
     void printService();
+    void editMiscNotes();
+    void submitMiscNotes();
 
     
 private:
@@ -75,6 +77,7 @@ private:
     void closeService();
     void openService();
     void loadTechnicians();
+    void loadMiscNotes();
     QString listEntry();
 };
 
