@@ -162,6 +162,7 @@ QString NoteData::formatForText()
     QString formattedNote = "";
     formattedNote += "Customer: " + firstName + " " + lastName + "\n";
     formattedNote += "Phone Number: " + phoneNumber + "\n";
+    formattedNote += "Order Number: " + orderNumber + "\n";
     formattedNote += "Services: " + services + "\n";
     formattedNote += "Status: " + serviceStatusToText() + "\n";
     formattedNote += "Started: " + startedDate.toString() + "\t\t" + "Due: " + dueDate.toString() + "\n";
