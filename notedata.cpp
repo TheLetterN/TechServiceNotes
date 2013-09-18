@@ -220,14 +220,15 @@ NoteData::ComputerType NoteData::computerTypeFromText(const QString &text)
 
 NoteData::ServiceStatus NoteData::serviceStatusFromText(const QString &text)
 {
-    if (text == "Not Started")
+    if (text == "Not Started") {
         return NotStarted;
-    else if (text == "In Progress")
+    } else if (text == "In Progress") {
         return InProgress;
-    else if (text == "Customer Called")
+    } else if (text == "Customer Called") {
         return CustomerCalled;
-    else
+    } else {
         return Closed;
+    }
 }
 
 
@@ -386,7 +387,7 @@ void NoteData::parseFromFile(QString tempText) {
     } else if (tempText.contains("DUE_DATE=")) {
         dueDate = QDateTime::fromString(tempText.remove(0, tempText.indexOf("=") + 1));
     } else if (tempText.contains("COMPUTER_TYPE=")) {
-        computerTypeFromText(tempText.remove(0, tempText.indexOf("=") + 1));
+        cType = computerTypeFromText(tempText.remove(0, tempText.indexOf("=") + 1));
     } else if (tempText.contains("COMPUTER_MODEL=")) {
         computerModel = tempText.remove(0, tempText.indexOf("=") + 1);
     } else if (tempText.contains("LOCATION=")) {
@@ -398,7 +399,7 @@ void NoteData::parseFromFile(QString tempText) {
     } else if (tempText.contains("CURRENT_TECHNICIAN=")) {
         currentTechnician = tempText.remove(0, tempText.indexOf("=") + 1);
     } else if (tempText.contains("SERVICES_STATUS=")) {
-        serviceStatusFromText(tempText.remove(0, tempText.indexOf("=") + 1));
+        sStatus = serviceStatusFromText(tempText.remove(0, tempText.indexOf("=") + 1));
     }
 }
 
